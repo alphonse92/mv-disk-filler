@@ -28,7 +28,7 @@ public class bootstrap {
         }
         try {
             File root = new File(arguments.getOrDefault("rootpath", "diskfiller"));
-            File pathsFile = new File(arguments.getOrDefault("pathfile", "rutas.txt"));
+            File pathsFile = new File(arguments.getOrDefault("pathfile", "rutas"));
 
             if (!pathsFile.isFile()) {
                 throw new DiskFillerException("No se pudo encontrar el archivo de rutas especificado: " + pathsFile.getAbsolutePath());
@@ -36,7 +36,9 @@ public class bootstrap {
 
             if (root.isDirectory()
                     || (!root.isDirectory() && root.mkdir())) {
+
                 new DiskFiller(root.getAbsolutePath())
+                        .debug(true)
                         .createDirectories(pathsFile.getAbsolutePath());
             } else {
                 throw new DiskFillerException("No se pudo encontrar el directorio raíz: " + root.getAbsolutePath());

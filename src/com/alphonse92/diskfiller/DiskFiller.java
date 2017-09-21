@@ -20,15 +20,24 @@ import java.util.ArrayList;
  */
 public class DiskFiller {
 
+    public static byte VERBOSE_NONE = 0;
+    public static byte VERBOSE_ALL = 1;
     private String root = null;
     private boolean status = true;
     private String status_message = "";
     private Exception status_ex = null;
     private ArrayList<File> filesArray = null;
+    private boolean debug = false;
+    private byte verbose = 0;
 
     public DiskFiller(String root) {
         this.root = root;
+        this.verbose = DiskFiller.VERBOSE_NONE;
+    }
 
+    public DiskFiller debug(boolean debug) {
+        this.debug = debug;
+        return this;
     }
 
     public DiskFiller createDirectories(String pathToFilePaths) throws DiskFillerException {
