@@ -3,22 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.alphonse92.diskfiller;
-
-import java.io.File;
+package com.alphonse92.diskfiller.Exception;
 
 /**
  *
  * @author Eliecer Alejandro Molina Vergel <alejandro_mover@hotmail.com>
  */
-public class bootstrap {
+public class DiskFillerException extends Exception {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        String root = args[0];
-
+    public DiskFillerException(String message) {
+        super(message);
     }
 
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.alphonse92.diskfiller;
+package com.alphonse92.diskfiller.util;
 
 import java.io.File;
 
@@ -11,14 +11,15 @@ import java.io.File;
  *
  * @author Eliecer Alejandro Molina Vergel <alejandro_mover@hotmail.com>
  */
-public class bootstrap {
+public class FileUtil {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        String root = args[0];
+    public static void purgeDirectory(File dir) {
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory()) {
+                purgeDirectory(file);
+            }
+            file.delete();
+        }
 
     }
-
 }
