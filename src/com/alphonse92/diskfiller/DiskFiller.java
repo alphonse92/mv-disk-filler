@@ -13,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +33,7 @@ public class DiskFiller {
 
     public DiskFiller createDirectories(String pathToFilePaths) throws DiskFillerException {
         this.valideStatus();
-        
+
         try {
             this.filesArray = this.getFilesFromArrayPaths(this.getArrayOfPaths(pathToFilePaths));
             boolean success = true;
@@ -76,7 +74,7 @@ public class DiskFiller {
     private ArrayList<File> getFilesFromArrayPaths(ArrayList<String> arrayPaths) {
         ArrayList<File> out = new ArrayList();
         for (String path : arrayPaths) {
-            out.add(new File(this.root + "/" + path));
+            out.add(new File(this.root + File.separator + path));
         }
         return out;
     }
