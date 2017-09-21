@@ -1,2 +1,2 @@
 # mv-disk-filler
-A simple php aplication for create a fake file structure with fake data
+A simple java aplication for create a fake file structure with fake data
