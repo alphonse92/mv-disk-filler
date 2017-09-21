@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mv.disk.filer;
+package com.alphonse92.diskfiller;
 
 /**
  *
- * @author usuario
+ * @author Eliecer Alejandro Molina Vergel <alejandro_mover@hotmail.com>
  */
 public class bootstrap {
 
