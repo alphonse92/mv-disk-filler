@@ -30,11 +30,12 @@ public class DiskFiller {
 
     public DiskFiller(String root) {
         this.root = root;
-        
+
     }
 
     public DiskFiller createDirectories(String pathToFilePaths) throws DiskFillerException {
         this.valideStatus();
+        
         try {
             this.filesArray = this.getFilesFromArrayPaths(this.getArrayOfPaths(pathToFilePaths));
             boolean success = true;
