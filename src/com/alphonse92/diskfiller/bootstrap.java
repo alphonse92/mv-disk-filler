@@ -39,7 +39,9 @@ public class bootstrap {
 
                 new DiskFiller(root.getAbsolutePath())
                         .debug(true, DiskFiller.VERBOSE_ALL)
-                        .createDirectories(500, 3, 10);
+                        .createDirectories(Integer.parseInt(arguments.getOrDefault("ndirs", "500")),
+                                Integer.parseInt(arguments.getOrDefault("mindepth", "3")),
+                                Integer.parseInt(arguments.getOrDefault("mindepth", "10")));
             } else {
                 throw new DiskFillerException("No se pudo encontrar el directorio raíz: " + root.getAbsolutePath());
             }

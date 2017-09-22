@@ -69,6 +69,7 @@ public class DiskFiller {
             while (nSubdiretories-- > 0) {
                 nameFolder += File.separator + StringUtil.getRandomString(5, true, true, false);
             }
+            System.out.println(nameFolder);
             lines.add(nameFolder);
         }
         return lines;

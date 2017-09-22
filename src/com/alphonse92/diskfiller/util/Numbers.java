@@ -12,6 +12,6 @@ package com.alphonse92.diskfiller.util;
 public class Numbers {
 
     public static int getRandomInt(int min, int max) {
-        return (int) Math.random() * max + min;
+        return (int) (Math.random() * max + min);
     }
 }

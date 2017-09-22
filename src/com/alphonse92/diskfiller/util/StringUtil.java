@@ -26,7 +26,7 @@ public class StringUtil {
         while (length-- > 0) {
             out += in.charAt(Numbers.getRandomInt(0, in.length()));
         }
-        
+
         return out;
     }
 
