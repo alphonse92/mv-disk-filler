@@ -6,12 +6,16 @@
 package com.alphonse92.diskfiller;
 
 import com.alphonse92.diskfiller.Exception.DiskFillerException;
+import com.alphonse92.diskfiller.util.DebugUtil;
 import com.alphonse92.diskfiller.util.FileUtil;
+import com.alphonse92.diskfiller.util.Numbers;
+import com.alphonse92.diskfiller.util.StringUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -35,25 +39,57 @@ public class DiskFiller {
         this.verbose = DiskFiller.VERBOSE_NONE;
     }
 
-    public DiskFiller debug(boolean debug) {
+    public DiskFiller debug(boolean debug, byte verbose) {
         this.debug = debug;
+        this.verbose = verbose;
         return this;
     }
 
+    public DiskFiller createDirectories(int numberOfDirectories, int minDepth, int maxDepth) throws DiskFillerException {
+        try {
+            String pathToFilePaths = "rutas";
+            PrintWriter writer = new PrintWriter(pathToFilePaths, "UTF-8");
+            getAleatoryPaths(numberOfDirectories, minDepth, maxDepth).forEach((path) -> {
+                writer.println(path);
+            });
+            writer.close();
+            this.createDirectories(pathToFilePaths);
+        } catch (IOException e) {
+            this.manageException(e.getMessage(), e);
+        }
+
+        return this;
+    }
+
+    private ArrayList<String> getAleatoryPaths(int numberOfDirectories, int minDepth, int maxDepth) {
+        ArrayList<String> lines = new ArrayList();
+        while (numberOfDirectories-- > 0) {
+            String nameFolder = StringUtil.getRandomString(10, true, true, false);
+            int nSubdiretories = Numbers.getRandomInt(minDepth, maxDepth);
+            while (nSubdiretories-- > 0) {
+                nameFolder += File.separator + StringUtil.getRandomString(5, true, true, false);
+            }
+            lines.add(nameFolder);
+        }
+        return lines;
+    }
+
     public DiskFiller createDirectories(String pathToFilePaths) throws DiskFillerException {
+        String method = "createDirectories";
         this.valideStatus();
 
         try {
             this.filesArray = this.getFilesFromArrayPaths(this.getArrayOfPaths(pathToFilePaths));
             boolean success = true;
             for (File file : this.filesArray) {
+
                 success = success && file.mkdirs();
+                debug(method, "Creating directory \"" + file.getAbsolutePath() + "\" " + (success ? "[OK]" : "[FAIL]"));
             }
 
             if (!success) {
-                this.removeRootChildren();
                 this.manageException("No se pudieron crear todos los directorios",
-                        new DiskFillerException("No se pudieron crear todos los directorios"));
+                        new Exception("No se pudieron crear todos los directorios"));
             }
 
         } catch (Exception ex) {
@@ -63,16 +99,17 @@ public class DiskFiller {
         return this;
     }
 
-    private void manageException(String msg, Exception e) {
+    private void manageException(String msg, Exception e) throws DiskFillerException {
         this.status = false;
         this.status_message = msg;
         this.status_ex = e;
+        throw new DiskFillerException(e.getMessage());
     }
 
     private void valideStatus() throws DiskFillerException {
         if (!this.status) {
             this.status_ex.printStackTrace();
-            throw new DiskFillerException(this.status_message);
+            this.manageException(this.status_message, new DiskFillerException(this.status_message));
         }
     }
 
@@ -83,7 +120,9 @@ public class DiskFiller {
     private ArrayList<File> getFilesFromArrayPaths(ArrayList<String> arrayPaths) {
         ArrayList<File> out = new ArrayList();
         for (String path : arrayPaths) {
-            out.add(new File(this.root + File.separator + path));
+            if (path.length() > 0) {
+                out.add(new File(this.root + File.separator + path));
+            }
         }
         return out;
     }
@@ -97,6 +136,13 @@ public class DiskFiller {
             out.add(line);
         }
         return out;
+    }
+
+    private void debug(String method, String text) {
+        if (this.debug && this.verbose == DiskFiller.VERBOSE_ALL) {
+            DebugUtil.debug(DiskFiller.class.getSimpleName(), method, text);
+        }
+
     }
 
     //getters and setters

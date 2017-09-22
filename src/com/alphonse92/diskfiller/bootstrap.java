@@ -38,8 +38,8 @@ public class bootstrap {
                     || (!root.isDirectory() && root.mkdir())) {
 
                 new DiskFiller(root.getAbsolutePath())
-                        .debug(true)
-                        .createDirectories(pathsFile.getAbsolutePath());
+                        .debug(true, DiskFiller.VERBOSE_ALL)
+                        .createDirectories(500, 3, 10);
             } else {
                 throw new DiskFillerException("No se pudo encontrar el directorio raíz: " + root.getAbsolutePath());
             }
