@@ -45,36 +45,6 @@ public class DiskFiller {
         return this;
     }
 
-    public DiskFiller createDirectories(int numberOfDirectories, int minDepth, int maxDepth) throws DiskFillerException {
-        try {
-            String pathToFilePaths = "rutas";
-            PrintWriter writer = new PrintWriter(pathToFilePaths, "UTF-8");
-            getAleatoryPaths(numberOfDirectories, minDepth, maxDepth).forEach((path) -> {
-                writer.println(path);
-            });
-            writer.close();
-            this.createDirectories(pathToFilePaths);
-        } catch (IOException e) {
-            this.manageException(e.getMessage(), e);
-        }
-
-        return this;
-    }
-
-    private ArrayList<String> getAleatoryPaths(int numberOfDirectories, int minDepth, int maxDepth) {
-        ArrayList<String> lines = new ArrayList();
-        while (numberOfDirectories-- > 0) {
-            String nameFolder = StringUtil.getRandomString(10, true, true, false);
-            int nSubdiretories = Numbers.getRandomInt(minDepth, maxDepth);
-            while (nSubdiretories-- > 0) {
-                nameFolder += File.separator + StringUtil.getRandomString(5, true, true, false);
-            }
-            System.out.println(nameFolder);
-            lines.add(nameFolder);
-        }
-        return lines;
-    }
-
     public DiskFiller createDirectories(String pathToFilePaths) throws DiskFillerException {
         String method = "createDirectories";
         this.valideStatus();
@@ -83,21 +53,64 @@ public class DiskFiller {
             this.filesArray = this.getFilesFromArrayPaths(this.getArrayOfPaths(pathToFilePaths));
             boolean success = true;
             for (File file : this.filesArray) {
-
-                success = success && file.mkdirs();
-                debug(method, "Creating directory \"" + file.getAbsolutePath() + "\" " + (success ? "[OK]" : "[FAIL]"));
+                success = success && file.mkdir();
+                debug((success ? DebugUtil.TYPE_NORMAL : DebugUtil.TYPE_ERROR), method, "Creating directory on disk \"" + file.getAbsolutePath() + "\" " + (success ? "[OK]" : "[FAIL]"));
             }
-
-            if (!success) {
-                this.manageException("No se pudieron crear todos los directorios",
-                        new Exception("No se pudieron crear todos los directorios"));
-            }
-
         } catch (Exception ex) {
             this.manageException(ex.getMessage(), ex);
         }
 
         return this;
+    }
+
+    public DiskFiller createDirectories(int numberOfDirectories, int minDepth, int maxDepth, int maxNSubdirectories) throws DiskFillerException {
+        try {
+            String pathToFilePaths = "rutas";
+            ArrayList<String> lines = getAleatoryPaths(numberOfDirectories, Numbers.getRandomInt(minDepth, maxDepth), maxNSubdirectories, 0, "", new ArrayList<String>());
+            try (PrintWriter writer = new PrintWriter(pathToFilePaths, "UTF-8")) {
+                lines.forEach((line) -> {
+                    debug(DebugUtil.TYPE_NORMAL, "createDirectories", "Writting directory in file path\"" + line + "\"");
+                    writer.println(line);
+                });
+                writer.close();
+            }
+        } catch (IOException e) {
+            this.manageException(e.getMessage(), e);
+        } catch (Exception e) {
+            this.manageException(e.getMessage(), e);
+        }
+
+        return this;
+    }
+
+    /**
+     * Metodo para obetener un arbol de directorios
+     *
+     * @param numberOfDirectories el numero total de directorios (raiz) que se
+     * crearán, No es el total sumando los subdirectorios, pues estos son
+     * aleatorios
+     * @param depth profundidad máxima del árbol de directorios desde la carpeta
+     * raiz (depth=0)''
+     * @param level nivel del arbol donde se están creando los subdirectorios
+     * @param root raiz actual del nivel directorio
+     * @return ArrayList con todas las rutas a cada uno de los directorios y
+     * subdirectorios
+     */
+    private ArrayList<String> getAleatoryPaths(int numberOfDirectories, int depth, int maxNDirectoriesPerLevel, int level, String root, ArrayList<String> lines) {
+        if (level <= depth) {
+            while (numberOfDirectories > 0) {
+                //creamos el nombre del directorio
+                String child = root + File.separator + StringUtil.getRandomString(10, true, true, false);
+                //agregamos al array
+                lines.add(child);
+                //recursivamente llamamos la función, pasandole como parámetro el numero de subdirectorios que debe tener
+                lines = this.getAleatoryPaths(Numbers.getRandomInt(0, maxNDirectoriesPerLevel), depth, maxNDirectoriesPerLevel, level + 1, child, lines);
+                numberOfDirectories--;
+
+            }
+        }
+        return lines;
+
     }
 
     private void manageException(String msg, Exception e) throws DiskFillerException {
@@ -139,9 +152,9 @@ public class DiskFiller {
         return out;
     }
 
-    private void debug(String method, String text) {
+    private void debug(byte type, String method, String text) {
         if (this.debug && this.verbose == DiskFiller.VERBOSE_ALL) {
-            DebugUtil.debug(DiskFiller.class.getSimpleName(), method, text);
+            DebugUtil.debug(type, DiskFiller.class.getSimpleName(), method, text);
         }
 
     }

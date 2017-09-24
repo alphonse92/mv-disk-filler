@@ -11,7 +11,15 @@ package com.alphonse92.diskfiller.util;
  */
 public class DebugUtil {
 
-    public static void debug(String name, String method, String message) {
-        System.out.println(name + "." + method + " -> " + message);
+    public static byte TYPE_ERROR = 0;
+    public static byte TYPE_NORMAL = 1;
+
+    public static void debug(byte type, String name, String method, String message) {
+        if (type == DebugUtil.TYPE_ERROR) {
+            System.err.println(name + "." + method + " -> " + message);
+        } else if (type == DebugUtil.TYPE_NORMAL) {
+            System.out.println(name + "." + method + " -> " + message);
+        }
+
     }
 }
