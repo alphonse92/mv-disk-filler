@@ -33,6 +33,7 @@ public class DiskFiller {
     private ArrayList<File> filesArray = null;
     private boolean debug = false;
     private byte verbose = 0;
+    private ArrayList<String> lines = null;
 
     public DiskFiller(String root) {
         this.root = root;
@@ -45,30 +46,31 @@ public class DiskFiller {
         return this;
     }
 
-    public DiskFiller createDirectories(String pathToFilePaths) throws DiskFillerException {
+    public DiskFiller createDirectoriesFromFilePaths(String pathToFilePaths) throws DiskFillerException {
         String method = "createDirectories";
         this.valideStatus();
 
         try {
-            this.filesArray = this.getFilesFromArrayPaths(this.getArrayOfPaths(pathToFilePaths));
+            this.lines = this.lines == null ? this.getArrayOfPaths(pathToFilePaths) : this.lines;
+            this.filesArray = this.getFilesFromArrayPaths(this.lines);
             boolean success = true;
             for (File file : this.filesArray) {
                 success = success && file.mkdir();
                 debug((success ? DebugUtil.TYPE_NORMAL : DebugUtil.TYPE_ERROR), method, "Creating directory on disk \"" + file.getAbsolutePath() + "\" " + (success ? "[OK]" : "[FAIL]"));
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             this.manageException(ex.getMessage(), ex);
         }
 
         return this;
     }
 
-    public DiskFiller createDirectories(int numberOfDirectories, int minDepth, int maxDepth, int maxNSubdirectories) throws DiskFillerException {
+    public DiskFiller createAleatoryPathsDirectories(int numberOfDirectories, int minDepth, int maxDepth, int maxNSubdirectories) throws DiskFillerException {
         try {
             String pathToFilePaths = "rutas";
-            ArrayList<String> lines = getAleatoryPaths(numberOfDirectories, Numbers.getRandomInt(minDepth, maxDepth), maxNSubdirectories, 0, "", new ArrayList<String>());
+            this.lines = getAleatoryPaths(numberOfDirectories, Numbers.getRandomInt(minDepth, maxDepth), maxNSubdirectories, 0, "", new ArrayList<String>());
             try (PrintWriter writer = new PrintWriter(pathToFilePaths, "UTF-8")) {
-                lines.forEach((line) -> {
+                this.lines.forEach((line) -> {
                     debug(DebugUtil.TYPE_NORMAL, "createDirectories", "Writting directory in file path\"" + line + "\"");
                     writer.println(line);
                 });

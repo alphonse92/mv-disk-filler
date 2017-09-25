@@ -8,8 +8,6 @@ package com.alphonse92.diskfiller;
 import com.alphonse92.diskfiller.Exception.DiskFillerException;
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -56,7 +54,8 @@ public class bootstrap {
                     .debug(true, DiskFiller.VERBOSE_ALL);
             //validamos si existe el directorio raíz, si no existe lo crea si ocurre algo dice que no se pudo
             if (root.isDirectory() || (!root.isDirectory() && root.mkdir())) {
-                df = createDirectories(arguments, df);
+                createDirectories(arguments, df);
+
             } else {
                 throw new DiskFillerException("No se pudo encontrar el directorio raíz: " + root.getAbsolutePath());
             }
@@ -74,17 +73,17 @@ public class bootstrap {
             File pathsFile = new File(arguments.getOrDefault(bootstrap.PARAM_PATH_FILE, bootstrap.PARAM_PATH_FILE_DEFAULT));
             if (method == bootstrap.USE_EXIST_FILE_PATHS) {
                 if (!pathsFile.isFile()) {
-                    throw new DiskFillerException("No se pudo encontrar el archivo de rutas especificada: " + pathsFile.getAbsolutePath());
+                    throw new DiskFillerException("File paths wasn't found in selected path (in parameters): " + pathsFile.getAbsolutePath());
                 }
 
             } else if (method == bootstrap.CREATE_ALEATORY_FILE_PATHS) {
-                return df.createDirectories(Integer.parseInt(arguments.getOrDefault(PARAM_CREATE_DIR_NDIRS, PARAM_CREATE_DIR_NDIRS_DEFAULT)),
+                return df.createAleatoryPathsDirectories(Integer.parseInt(arguments.getOrDefault(PARAM_CREATE_DIR_NDIRS, PARAM_CREATE_DIR_NDIRS_DEFAULT)),
                         Integer.parseInt(arguments.getOrDefault(PARAM_CREATE_DIR_MINDEPTH, PARAM_CREATE_DIR_MINDEPTH_DEFAULT)),
                         Integer.parseInt(arguments.getOrDefault(PARAM_CREATE_DIR_MAXDEPTH, PARAM_CREATE_DIR_MAXDEPTH_DEFAULT)),
                         Integer.parseInt(arguments.getOrDefault(PARAM_CREATE_DIR_MAXNSUBDIRECTORIES, PARAM_CREATE_DIR_MAXNSUBDIRECTORIES_DEFAULT)));
             }
 
-            return df.createDirectories(pathsFile.getAbsolutePath());
+            return df.createDirectoriesFromFilePaths(pathsFile.getAbsolutePath());
         }
         return df;
     }
