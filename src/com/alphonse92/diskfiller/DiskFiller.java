@@ -6,6 +6,8 @@
 package com.alphonse92.diskfiller;
 
 import com.alphonse92.diskfiller.Exception.DiskFillerException;
+import com.alphonse92.diskfiller.factories.ThreadFactory;
+import com.alphonse92.diskfiller.factories.threads.DiskFillerWorker;
 import com.alphonse92.diskfiller.util.DebugUtil;
 import com.alphonse92.diskfiller.util.FileUtil;
 import com.alphonse92.diskfiller.util.Numbers;
@@ -158,6 +160,46 @@ public class DiskFiller {
         if (this.debug && this.verbose == DiskFiller.VERBOSE_ALL) {
             DebugUtil.debug(type, DiskFiller.class.getSimpleName(), method, text);
         }
+
+    }
+
+    public DiskFiller fill(int nWorkers, int size, byte measure) {
+
+        byte index = 1;
+        float bytesxworker = ((float) size) / ((float) nWorkers);
+        for (ArrayList<String> workLoad : this.getWorksWorkLoad(nWorkers)) {
+            DiskFillerWorker dfw = ThreadFactory.getWorker("WORKER #" + index, workLoad, bytesxworker, measure);
+            dfw.start();
+            index++;
+        }
+
+        return this;
+
+    }
+
+    private ArrayList<ArrayList<String>> getWorksWorkLoad(int nWorkers) {
+
+        ArrayList<ArrayList<String>> out = new ArrayList();
+        ArrayList<String> current_chunk = new ArrayList();
+        //obtenemos el numero de cargas de trabajo para cada worker
+        int sizeChunk = ((int) (this.lines.size() / nWorkers)) + 1;
+        //declaramos el index
+        int current_chunk_index = 0;
+        for (String path : this.lines) {
+            //obtenemos el indice, usamos el operador modulo para evitar 
+            //cargas de trbajo desiguales
+            current_chunk_index = ++current_chunk_index % sizeChunk;
+            //añadios el path al chunk actual
+            current_chunk.add(path);
+            //si el indice ahora es 0 entonces guardamos la carga de trabajo
+            //para el worker y reseteamos el chunk actual
+            if (current_chunk_index == 0) {
+                out.add(current_chunk);
+                current_chunk = new ArrayList();
+            }
+        }
+
+        return out;
 
     }
 

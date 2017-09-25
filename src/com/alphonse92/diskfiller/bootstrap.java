@@ -6,6 +6,7 @@
 package com.alphonse92.diskfiller;
 
 import com.alphonse92.diskfiller.Exception.DiskFillerException;
+import com.alphonse92.diskfiller.factories.ThreadFactory;
 import java.io.File;
 import java.util.HashMap;
 
@@ -51,10 +52,12 @@ public class bootstrap {
             File root = new File(arguments.getOrDefault(bootstrap.PARAM_ROOT_PATH, bootstrap.PARAM_ROOT_PATH_DEFAULT));
 
             DiskFiller df = new DiskFiller(root.getAbsolutePath())
-                    .debug(true, DiskFiller.VERBOSE_ALL);
+                    //debug and log can cause permformance decreasse
+                    .debug(false, DiskFiller.VERBOSE_ALL);
             //validamos si existe el directorio raíz, si no existe lo crea si ocurre algo dice que no se pudo
             if (root.isDirectory() || (!root.isDirectory() && root.mkdir())) {
-                createDirectories(arguments, df);
+                createDirectories(arguments, df)
+                        .fill( 3, 1, ThreadFactory.GB);
 
             } else {
                 throw new DiskFillerException("No se pudo encontrar el directorio raíz: " + root.getAbsolutePath());
